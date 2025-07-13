@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Health & Safety Dashboard (MQTT)</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            padding: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 220px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h2 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        #aiDecision {
+            font-size: 30px;
+            font-weight: bold;
+            transition: color 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Health & Safety Dashboard</h1>
+    <div class="dashboard">
+        <div class="card">
+            <h2>Temperature</h2>
+            <div class="value" id="temperature">-- C</div>
+        </div>
+        <div class="card">
+            <h2>Humidity</h2>
+            <div class="value" id="humidity">-- %</div>
+        </div>
+        <div class="card">
+            <h2>Light</h2>
+            <div class="value" id="light">--</div>
+        </div>
+        <div class="card">
+            <h2>Sound</h2>
+            <div class="value" id="sound">--</div>
+        </div>
+        <div class="card">
+            <h2>Motion</h2>
+            <div class="value" id="motion">--</div>
+        </div>
+        <div class="card">
+            <h2>Current Plan</h2>
+            <div id="aiDecision" class="value">--</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='mqtt.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
