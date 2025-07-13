@@ -60,10 +60,10 @@ def apply_ai_decision(decision):
         grovepi.digitalWrite(BUZZER, 0)
         client.publish(TOPIC_PREFIX + "ai_decision", "OFF")
         print("? LED & BUZZER turned OFF")
-        time.sleep(0.05)  # tiny delay to let hardware settle
-        grovepi.digitalWrite(LED, 0)  # ensure OFF
+        time.sleep(0.05)
+        grovepi.digitalWrite(LED, 0)
         grovepi.digitalWrite(BUZZER, 0)
-        
+
 # -------------------------------
 # Main Loop
 # -------------------------------
@@ -74,11 +74,19 @@ try:
             # Sensor readings
             # -----------------------
             motion = grovepi.digitalRead(PIR_SENSOR)
-            light = grovepi.analogRead(LIGHT_SENSOR)
-            sound = grovepi.analogRead(SOUND_SENSOR)
+            time.sleep(1)
 
-            # Friend-style safe temp/humidity read
+            try:
+                light_raw = grovepi.analogRead(LIGHT_SENSOR)
+                light = float(light_raw / 10.24)
+            except Exception:
+                light = -1
+
+            sound = grovepi.analogRead(SOUND_SENSOR)
+            time.sleep(1)
+
             reading = grovepi.dht(TEMP_HUM_SENSOR, 0)
+            time.sleep(1)
             try:
                 temp, hum = reading[0], reading[1]
                 if temp is None or hum is None or temp != temp or hum != hum:
@@ -105,26 +113,32 @@ try:
             # AI Planning
             # -----------------------
             state = {
-                "dark": light < 100,
+                "dark": light < 20,
                 "motion_detected": motion,
-                "sound_detected": sound > 30
+                "sound_detected": sound > 100,
+                "high_temp": temp > 30
             }
             generate_problem_file(state)
             plan = run_planner()
 
-            if any("activate-safety" in step for step in plan):
+            # Decide plan type and publish
+            if state["high_temp"]:
+                print("?? FIRE PLAN FOUND by AI planner.")
+                client.publish(TOPIC_PREFIX + "plan_type", "FIRE PLAN")
                 apply_ai_decision("ON")
-                with open("ai_decision.txt", "w") as f:
-                    f.write("ON")
+            elif any("activate-safety" in step for step in plan):
+                print("?? ALERT PLAN FOUND by AI planner.")
+                client.publish(TOPIC_PREFIX + "plan_type", "ALERT PLAN")
+                apply_ai_decision("ON")
             else:
+                print("? SAFE PLAN FOUND by AI planner.")
+                client.publish(TOPIC_PREFIX + "plan_type", "SAFE PLAN")
                 apply_ai_decision("OFF")
-                with open("ai_decision.txt", "w") as f:
-                    f.write("OFF")
 
             # -----------------------
             # Console Output
             # -----------------------
-            print(f"TEMP: {temp:.1f}C | HUM: {hum:.1f}% | LIGHT: {light} | SOUND: {sound} | MOTION: {'Yes' if motion else 'No'}")
+            print(f"TEMP: {temp:.1f}C | HUM: {hum:.1f}% | LIGHT: {light:.1f}% | SOUND: {sound} | MOTION: {'Yes' if motion else 'No'}")
 
         except Exception as e:
             print(f"?? Sensor or loop error: {e}")

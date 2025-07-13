@@ -1,1 +1,0 @@
-# Smart-Health-and-Safety-Monitoring-System-for-Educational-Buildings-Using-IOT

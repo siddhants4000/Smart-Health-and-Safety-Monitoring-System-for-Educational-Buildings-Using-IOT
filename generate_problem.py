@@ -9,9 +9,10 @@ def generate_problem_file(state):
             f.write("    (motion-detected)\n")
         if state.get("sound_detected"):
             f.write("    (sound-detected)\n")
+        if state.get("high_temp"):
+            f.write("    (high-temp)\n")
         f.write("    (led-off)\n")
         f.write("    (buzzer-off)\n")
         f.write("  )\n")
         f.write("  (:goal (and (led-on) (buzzer-on)))\n")
         f.write(")\n")
-

@@ -1,7 +1,10 @@
 (define (problem building-scenario)
   (:domain smart-building)
   (:init
+    (dark)
+    (motion-detected)
     (sound-detected)
+    (high-temp)
     (led-off)
     (buzzer-off)
   )

@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-def run_planner():
+def run_planner(high_temp_triggered=False):
     try:
         env = os.environ.copy()
         env["PYTHONWARNINGS"] = "ignore"
@@ -13,15 +13,17 @@ def run_planner():
         )
 
         output = result.stdout.lower() + result.stderr.lower()
-        #print("?? PLANNER OUTPUT:\n", output)
 
         if "plan length:" in output:
-            print("?? PLAN FOUND by AI planner.")
+            if high_temp_triggered:
+                print("FIRE PLAN FOUND by AI planner.")
+            else:
+                print("ALERT PLAN FOUND by AI planner.")
             return ["activate-safety"]
         else:
-            print("?? NO PLAN FOUND.")
+            print("SAFE PLAN FOUND by AI planner.")
             return []
 
     except Exception as e:
-        print(f"? Planner error: {e}")
+        print(f"Planner error: {e}")
         return []
